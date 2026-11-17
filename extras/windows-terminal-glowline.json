@@ -1,0 +1,23 @@
+{
+  "name": "Glowline",
+  "background": "#300A24",
+  "foreground": "#E8ECF4",
+  "cursorColor": "#CFF5DB",
+  "selectionBackground": "#713234",
+  "black": "#0F1216",
+  "red": "#FF5F5F",
+  "green": "#8AE0A5",
+  "yellow": "#FFB347",
+  "blue": "#6CB6FF",
+  "purple": "#C79BFF",
+  "cyan": "#5FD7D7",
+  "white": "#E8ECF4",
+  "brightBlack": "#696C72",
+  "brightRed": "#FF8F8F",
+  "brightGreen": "#CFF5DB",
+  "brightYellow": "#FCD53F",
+  "brightBlue": "#9CCFFF",
+  "brightPurple": "#E0C3FF",
+  "brightCyan": "#9FF0F0",
+  "brightWhite": "#FFFFFF"
+}

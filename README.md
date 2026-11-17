@@ -45,6 +45,22 @@ Requirements:
 
 The bar stretches to the terminal width (`COLUMNS`) and refreshes every 15 s.
 
+## Color theme
+
+The plugin also ships a Claude Code color theme, **Glowline**: red accent and prompt border, mint/orange/yellow mode colors, dark message panels, and red/green diffs, using the same colors as the status bar.
+
+Turn it on in Claude Code: `/theme` → **Glowline** (listed as from `glowline`). Switch back the same way.
+
+### Terminal background (optional)
+
+Claude Code themes can't change the terminal's own background. For the full look (aubergine `#300A24` background, mint cursor), add the scheme in [`extras/windows-terminal-glowline.json`](extras/windows-terminal-glowline.json) to Windows Terminal:
+
+1. Windows Terminal → Settings → **Open JSON file**.
+2. Paste the scheme object into the `"schemes": [ … ]` array.
+3. Set `"colorScheme": "Glowline"` on the profile you run Claude Code in (or pick it under that profile's *Appearance*).
+
+Other terminals: copy the same hex values into their color settings.
+
 ## How it works
 
 ```
@@ -54,6 +70,8 @@ scripts/statusline.js ──setup copies──▶ ~/.claude/hooks/glowline.js
 scripts/setup.js      ──setup writes──▶ ~/.claude/settings.json  "statusLine": { "command": "node …/glowline.js" }
 hooks/hooks.json      ──SessionStart──▶ re-copies statusline.js after a plugin update
 skills/setup/SKILL.md ── /glowline:setup [install|remove|status]
+themes/glowline.json  ── listed in /theme as "Glowline" (no setup needed)
+extras/…scheme.json   ── optional Windows Terminal background scheme
 ```
 
 Claude Code runs the status line command after each message, pipes session JSON to it on stdin, and shows what it prints.

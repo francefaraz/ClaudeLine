@@ -9,16 +9,16 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-// ── palette (matches omp's dark/red theme) ────────────────────────────────
+// ── palette (sampled from omp's dark/red theme; keep in sync with themes/glowline.json) ──
 const C = {
-  panel: '#14141a',
-  accent: '#f2666e',
+  panel: '#0f1216',
+  accent: '#ff5f5f',
   hot: '#ff3b3b',
-  text: '#e8e8ee',
-  muted: '#6c6c7a',
-  dim: '#3c3c48',
-  folder: '#f5c542',
-  branch: '#e8b450',
+  text: '#e8ecf4',
+  muted: '#696c72',
+  dim: '#3a3d44',
+  folder: '#fcd53f',
+  branch: '#ffb347',
   cost: '#d9c49c',
   caveman: '#d7870a',
 };
