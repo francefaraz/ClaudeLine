@@ -1,7 +1,7 @@
 {
   "name": "glowline",
   "description": "omp-style status line and color theme for Claude Code: time, model, folder, git, PR, cost, context gauge, session title.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Shaik Muneer"
   },

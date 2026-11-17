@@ -3,7 +3,7 @@
 > An oh-my-pi (omp) style status bar for Claude Code.
 
 ```
-( ⏱ 4m › Opus › 📁 ~/project › ⎇ feature/XYZ-123 !2 ?4 › #11 › $1.20 ) ────44%────── │ ─1M─ ( 💬 Session title )
+( ⏳ 4m › Opus › 📁 ~/project › ⎇ feature/XYZ-123 !2 ?4 › #11 › $1.20 ) ────44%────── │ ─1M─ ( 💬 Session title )
 ```
 
 A Claude Code **plugin** (installed as `glowline`): it uses Claude Code's official extension points (plugin + status line + hook) and does not patch or modify Claude Code itself.
@@ -26,24 +26,35 @@ Requirements:
 
 - Node.js 18+ as `node` on your PATH
 - `git` on PATH (optional; branch segment is skipped without it)
-- A **Nerd Font** in your terminal (e.g. JetBrainsMono Nerd Font, CaskaydiaCove Nerd Font); otherwise icons show as boxes
+- A **Nerd Font** in your terminal (e.g. JetBrainsMono Nerd Font, CaskaydiaCove Nerd Font) for the default icons; without one, use `/glowline:setup set icons emoji` or `plain`
 - A true-color terminal (Windows Terminal, VS Code, iTerm2, WezTerm, Kitty, …)
 
 ## What it shows
 
-| Segment | Source (Claude Code status line JSON) |
-| --- | --- |
-| Elapsed time | `cost.total_duration_ms` |
-| Model | `model.display_name` |
-| Folder | `workspace.current_dir`, home shortened to `~` |
-| Branch `↑ahead ↓behind !changed ?untracked` | `git status` in the current folder |
-| `#PR` / `!MR` | `pr.number`, once Claude Code detects an open PR/MR |
-| `$cost` | `cost.total_cost_usd` (estimate at list price) |
-| Context gauge + window size | `context_window.used_percentage`, `context_window_size`; bright red at ≥85% |
-| Session title | `session_name`; trimmed or hidden on narrow terminals |
-| `CAVEMAN` badge | Only when the caveman plugin is active |
+Default segments, left to right:
 
-The bar stretches to the terminal width (`COLUMNS`) and refreshes every 15 s.
+| Segment | Name | Source (Claude Code status line JSON) |
+| --- | --- | --- |
+| Elapsed time | `time` | `cost.total_duration_ms` |
+| Model | `model` | `model.display_name` |
+| Folder | `path` | `workspace.current_dir`, home shortened to `~` |
+| Branch `↑ahead ↓behind !changed ?untracked` | `git` | `git status` in the current folder; Ctrl+click opens the branch |
+| `#PR` / `!MR` | `pr` | `pr.number`, once Claude Code detects an open PR/MR; Ctrl+click opens it |
+| `$cost` | `cost` | `cost.total_cost_usd` (estimate at list price) |
+| `CAVEMAN` badge | `caveman` | Only when the caveman plugin is active |
+
+Optional segments (add with `set segments`):
+
+| Segment | Name | Shows |
+| --- | --- | --- |
+| Lines changed | `lines` | `+156 −23` this session |
+| Effort | `effort` | Reasoning effort level, e.g. `high` |
+| Usage limits | `limits` | `5h 23% 7d 61%` (Claude subscription usage windows; hidden when not reported) |
+| Clock | `clock` | Local time `HH:MM` |
+
+Right side: the context gauge (fill level and window size, colored low → mid → high at 50% / 80%) and the session title. The bar fits the terminal width: on narrow terminals the title shortens first, then low-priority segments drop out. It refreshes every 15 s.
+
+The status line runs locally and uses **no API tokens**.
 
 ## Color theme
 
@@ -67,9 +78,10 @@ Other terminals: copy the same hex values into their color settings.
 plugin (this repo)                         your machine
 ──────────────────                         ────────────
 scripts/statusline.js ──setup copies──▶ ~/.claude/hooks/glowline.js
+scripts/setup.js      ──setup copies──▶ ~/.claude/hooks/glowline-setup.js
 scripts/setup.js      ──setup writes──▶ ~/.claude/settings.json  "statusLine": { "command": "node …/glowline.js" }
-hooks/hooks.json      ──SessionStart──▶ re-copies statusline.js after a plugin update
-skills/setup/SKILL.md ── /glowline:setup [install|remove|status]
+hooks/hooks.json      ──SessionStart──▶ re-copies both scripts after a plugin update
+skills/setup/SKILL.md ── /glowline:setup <command>
 themes/glowline.json  ── listed in /theme as "Glowline" (no setup needed)
 extras/…scheme.json   ── optional Windows Terminal background scheme
 ```
@@ -80,13 +92,26 @@ Claude Code runs the status line command after each message, pipes session JSON 
 
 | Command | Effect |
 | --- | --- |
-| `/glowline:setup` | Install (copy script, set `statusLine`, back up settings) |
+| `/glowline:setup` | Install (copy scripts, set `statusLine`, back up settings) |
 | `/glowline:setup status` | Show what is configured |
-| `/glowline:setup remove` | Restore your previous `statusLine` (or remove ours) and delete the copied script |
+| `/glowline:setup remove` | Restore your previous `statusLine` (or remove ours) and delete the copied scripts |
+| `/glowline:setup theme [name]` | List themes, or switch theme |
+| `/glowline:setup preview` | Show every theme in your status bar for 60 seconds |
+| `/glowline:setup set <key> <value>` | Change one preference (see below) |
+| `/glowline:setup config` | Print current preferences |
+| `/glowline:setup reset` | Back to defaults |
+| `/glowline:setup help` | List commands and allowed values |
+
+Each `/glowline:setup …` call is a short Claude turn (a few hundred tokens). To change settings **without a Claude turn**, run the installed script yourself: from your own shell (no tokens at all), or with Claude Code's `!` prefix (only the short output joins the conversation):
+
+```
+!node ~/.claude/hooks/glowline-setup.js theme dracula
+```
 
 Files it touches:
 
-- `~/.claude/hooks/glowline.js`: the renderer
+- `~/.claude/hooks/glowline.js`, `~/.claude/hooks/glowline-setup.js`: the renderer and setup script
+- `~/.claude/glowline.json`: your preferences (created on first change; kept on `remove`)
 - `~/.claude/settings.json`: only the `statusLine` key
 - `~/.claude/settings.json.glowline.bak`: backup from the first install
 - `~/.claude/glowline.previous.json`: your old `statusLine`, if you had one
@@ -95,7 +120,51 @@ Files it touches:
 
 ## Customize
 
-Edit the `C` (colors) and `G` (Nerd Font icons) blocks at the top of `scripts/statusline.js`. To make a local tweak survive plugin updates, uninstall the plugin and keep the copy in `~/.claude/hooks/`.
+### Themes
+
+`omp` (default) · `dracula` · `catppuccin` · `tokyo-night` · `nord` · `gruvbox` · `mono`
+
+```
+/glowline:setup preview          # compare all themes in the real status bar
+/glowline:setup theme catppuccin
+```
+
+Outside Claude Code, `node ~/.claude/hooks/glowline.js --preview` prints every theme with sample data.
+
+### Preferences
+
+| Key | Values | Default |
+| --- | --- | --- |
+| `theme` | see above | `omp` |
+| `segments` | comma list, in display order: `time,model,path,git,pr,cost,lines,effort,limits,clock,caveman` | `time,model,path,git,pr,cost,caveman` |
+| `gauge` | `line` · `blocks` (`▰▰▰▱▱`) · `percent` · `off` | `line` |
+| `icons` | `nerd` · `emoji` · `plain` | `nerd` |
+| `separator` | `chevron` (›) · `powerline` (needs `icons nerd`) · `slash` · `dot` · `pipe` · `space` | `chevron` |
+| `title` | `on` · `off` | `on` |
+| `links` | `on` · `off` (Ctrl+click PR/branch; terminal must support OSC 8 links) | `on` |
+| `colors.<name>` | hex without `#` (e.g. `00d7af`), or `default` | theme's |
+
+Color names: `panel accent text muted dim folder branch cost ok bad gaugeLow gaugeMid gaugeHigh`.
+
+Examples:
+
+```
+/glowline:setup set segments model,git,pr,limits,clock   # hide cost (screen sharing) and add usage + clock
+/glowline:setup set gauge blocks
+/glowline:setup set icons plain                           # no Nerd Font needed
+/glowline:setup set colors.accent 00d7af
+```
+
+Or edit `~/.claude/glowline.json` directly. Unknown keys or bad values fall back to defaults, so a typo can't break the bar:
+
+```json
+{
+  "theme": "tokyo-night",
+  "segments": ["model", "git", "pr", "limits"],
+  "gauge": "blocks",
+  "colors": { "accent": "#00d7af" }
+}
+```
 
 ## Uninstall
 
