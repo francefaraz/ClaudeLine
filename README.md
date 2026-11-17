@@ -29,6 +29,20 @@ Requirements:
 - A **Nerd Font** in your terminal (e.g. JetBrainsMono Nerd Font, CaskaydiaCove Nerd Font) for the default icons; without one, use `/glowline:setup set icons emoji` or `plain`
 - A true-color terminal (Windows Terminal, VS Code, iTerm2, WezTerm, Kitty, …)
 
+## Quick start
+
+After install, try these (each change shows on the next message, or within 15 s):
+
+```
+/glowline:setup preview                                     # see all 7 themes in your bar for 60 s
+/glowline:setup theme catppuccin                            # pick one
+/glowline:setup set segments time,model,git,pr,lines,limits,clock
+/glowline:setup set gauge blocks
+/glowline:setup help                                        # everything you can change
+```
+
+Settings are saved, so they stay across sessions and restarts. `/glowline:setup reset` undoes everything.
+
 ## What it shows
 
 Default segments, left to right:
@@ -41,7 +55,7 @@ Default segments, left to right:
 | Branch `↑ahead ↓behind !changed ?untracked` | `git` | `git status` in the current folder; Ctrl+click opens the branch |
 | `#PR` / `!MR` | `pr` | `pr.number`, once Claude Code detects an open PR/MR; Ctrl+click opens it |
 | `$cost` | `cost` | `cost.total_cost_usd` (estimate at list price) |
-| `CAVEMAN` badge | `caveman` | Only when the caveman plugin is active |
+| `CAVEMAN` badge | `caveman` | Only when the separate [caveman](https://github.com/JuliusBrussee/caveman) plugin is active (see [FAQ](#faq)) |
 
 Optional segments (add with `set segments`):
 
@@ -166,12 +180,40 @@ Or edit `~/.claude/glowline.json` directly. Unknown keys or bad values fall back
 }
 ```
 
+## Update
+
+```
+/plugin update glowline
+```
+
+Restart Claude Code. The new scripts are copied in automatically when the session starts; no need to run setup again, and your preferences are kept.
+
 ## Uninstall
 
 ```
 /glowline:setup remove
 /plugin uninstall glowline
 ```
+
+## FAQ
+
+**Does the status bar use tokens?**
+No. It runs locally on your machine; redraws, refreshes, themes, and preview cost nothing. Only a `/glowline:setup …` command costs a few hundred tokens, once, when you run it, because Claude runs the script for you. Use the `!node ~/.claude/hooks/glowline-setup.js …` form (or your own terminal) to avoid even that.
+
+**Do I run `/glowline:setup` every time?**
+No, once per machine. It saves the `statusLine` entry in `settings.json`, which Claude Code reads on every start. Run it again only after `remove`, on a new machine, or if another tool replaced your status line.
+
+**Is this a mod?**
+No. It's a standard Claude Code plugin: a status line script, a SessionStart hook, a setup skill, and a color theme. Claude Code itself isn't modified, and uninstalling removes everything. (Claude Code [mods](https://code.claude.com/docs/en/plugins/mods/overview) can draw inside the UI, but still can't restyle the prompt box, so a mod wouldn't add anything here.)
+
+**What is `CAVEMAN` in my bar?**
+A badge from a different plugin, [caveman](https://github.com/JuliusBrussee/caveman), which makes Claude answer in short "caveman" style to save output tokens. Glowline only shows its mode (`CAVEMAN`, `CAVEMAN:ULTRA`, …); without caveman installed, the badge never appears. Hide it with `/glowline:setup set segments time,model,path,git,pr,cost`, or disable caveman itself in `/plugin`.
+
+**Why is the repo ClaudeLine but the plugin `glowline`?**
+Claude Code reserves plugin names starting with `claude-` for Anthropic, so the plugin needs its own name.
+
+**Can teammates use different themes?**
+Yes. Preferences live in each person's own `~/.claude/glowline.json`.
 
 ## Troubleshooting
 
