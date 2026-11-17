@@ -1,0 +1,10 @@
+{
+  "name": "omp-statusline",
+  "description": "omp-style status line for Claude Code: time, model, folder, git branch/changes, PR, cost, context gauge and session title.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Shaik Muneer"
+  },
+  "license": "MIT",
+  "keywords": ["statusline", "theme", "git", "context", "productivity"]
+}

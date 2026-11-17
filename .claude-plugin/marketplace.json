@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "omp-statusline",
+  "description": "omp-style status line for Claude Code.",
+  "owner": {
+    "name": "Shaik Muneer",
+    "url": "https://github.com/francefaraz"
+  },
+  "plugins": [
+    {
+      "name": "omp-statusline",
+      "description": "Powerline-style status bar: time, model, folder, git, PR, cost, context gauge, session title.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
