@@ -1,4 +1,4 @@
-# omp-statusline
+# ClaudeLine
 
 > An oh-my-pi (omp) style status bar for Claude Code.
 
@@ -6,19 +6,19 @@
 ( ⏱ 4m › Opus › 📁 ~/project › ⎇ feature/XYZ-123 !2 ?4 › #11 › $1.20 ) ────44%────── │ ─1M─ ( 💬 Session title )
 ```
 
-A Claude Code **plugin**: it uses Claude Code's official extension points (plugin + status line + hook) and does not patch or modify Claude Code itself.
+A Claude Code **plugin** (installed as `glowline`): it uses Claude Code's official extension points (plugin + status line + hook) and does not patch or modify Claude Code itself.
 
 ## Install
 
 In Claude Code:
 
 ```
-/plugin marketplace add francefaraz/ClaudeOmpStatusline
-/plugin install omp-statusline
-/omp-statusline:setup
+/plugin marketplace add francefaraz/ClaudeLine
+/plugin install glowline
+/glowline:setup
 ```
 
-On Claude Code 2.1.275+ the first two lines can be one: `/plugin install omp-statusline --marketplace francefaraz/ClaudeOmpStatusline`.
+On Claude Code 2.1.275+ the first two lines can be one: `/plugin install glowline --marketplace francefaraz/ClaudeLine`.
 
 The third command writes the `statusLine` entry in your `~/.claude/settings.json` (backup first). Plugins can't set the status line themselves, so this step is needed once.
 
@@ -50,10 +50,10 @@ The bar stretches to the terminal width (`COLUMNS`) and refreshes every 15 s.
 ```
 plugin (this repo)                         your machine
 ──────────────────                         ────────────
-scripts/statusline.js ──setup copies──▶ ~/.claude/hooks/omp-statusline.js
-scripts/setup.js      ──setup writes──▶ ~/.claude/settings.json  "statusLine": { "command": "node …/omp-statusline.js" }
+scripts/statusline.js ──setup copies──▶ ~/.claude/hooks/glowline.js
+scripts/setup.js      ──setup writes──▶ ~/.claude/settings.json  "statusLine": { "command": "node …/glowline.js" }
 hooks/hooks.json      ──SessionStart──▶ re-copies statusline.js after a plugin update
-skills/setup/SKILL.md ── /omp-statusline:setup [install|remove|status]
+skills/setup/SKILL.md ── /glowline:setup [install|remove|status]
 ```
 
 Claude Code runs the status line command after each message, pipes session JSON to it on stdin, and shows what it prints.
@@ -62,16 +62,16 @@ Claude Code runs the status line command after each message, pipes session JSON 
 
 | Command | Effect |
 | --- | --- |
-| `/omp-statusline:setup` | Install (copy script, set `statusLine`, back up settings) |
-| `/omp-statusline:setup status` | Show what is configured |
-| `/omp-statusline:setup remove` | Restore your previous `statusLine` (or remove ours) and delete the copied script |
+| `/glowline:setup` | Install (copy script, set `statusLine`, back up settings) |
+| `/glowline:setup status` | Show what is configured |
+| `/glowline:setup remove` | Restore your previous `statusLine` (or remove ours) and delete the copied script |
 
 Files it touches:
 
-- `~/.claude/hooks/omp-statusline.js`: the renderer
+- `~/.claude/hooks/glowline.js`: the renderer
 - `~/.claude/settings.json`: only the `statusLine` key
-- `~/.claude/settings.json.omp-statusline.bak`: backup from the first install
-- `~/.claude/omp-statusline.previous.json`: your old `statusLine`, if you had one
+- `~/.claude/settings.json.glowline.bak`: backup from the first install
+- `~/.claude/glowline.previous.json`: your old `statusLine`, if you had one
 
 `CLAUDE_CONFIG_DIR` is respected instead of `~/.claude`.
 
@@ -82,13 +82,13 @@ Edit the `C` (colors) and `G` (Nerd Font icons) blocks at the top of `scripts/st
 ## Uninstall
 
 ```
-/omp-statusline:setup remove
-/plugin uninstall omp-statusline
+/glowline:setup remove
+/plugin uninstall glowline
 ```
 
 ## Troubleshooting
 
-- **Nothing shows**: run `/omp-statusline:setup status`; run `claude --debug` to see the script's stderr.
+- **Nothing shows**: run `/glowline:setup status`; run `claude --debug` to see the script's stderr.
 - **Boxes instead of icons**: the terminal font is not a Nerd Font.
 - **`node` not found**: install Node.js 18+ and re-run setup.
 - **Branch missing for `\\wsl.localhost` paths**: git over the WSL share can exceed the 1.5 s timeout; run Claude Code inside WSL instead.

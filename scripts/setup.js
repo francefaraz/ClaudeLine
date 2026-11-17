@@ -2,7 +2,7 @@
 // Installs / removes / syncs the omp-style status line.
 //
 // Plugins can't set `statusLine` themselves, so this script:
-//   install  copies scripts/statusline.js to <config>/hooks/omp-statusline.js
+//   install  copies scripts/statusline.js to <config>/hooks/glowline.js
 //            (a stable path that survives plugin updates) and points
 //            settings.json `statusLine` at it. Backs up settings first and
 //            remembers any previous statusLine so `remove` can restore it.
@@ -18,13 +18,13 @@ const path = require('path');
 
 const configDir = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude');
 const settingsPath = path.join(configDir, 'settings.json');
-const backupPath = settingsPath + '.omp-statusline.bak';
-const previousPath = path.join(configDir, 'omp-statusline.previous.json');
+const backupPath = settingsPath + '.glowline.bak';
+const previousPath = path.join(configDir, 'glowline.previous.json');
 const bundled = path.join(__dirname, 'statusline.js');
-const target = path.join(configDir, 'hooks', 'omp-statusline.js');
+const target = path.join(configDir, 'hooks', 'glowline.js');
 const command = `node "${target.replace(/\\/g, '/')}"`;
 
-const isOurs = (sl) => typeof sl?.command === 'string' && sl.command.includes('omp-statusline.js');
+const isOurs = (sl) => typeof sl?.command === 'string' && sl.command.includes('glowline.js');
 
 function readSettings() {
   if (!fs.existsSync(settingsPath)) return {};
@@ -96,7 +96,7 @@ function status() {
   const settings = readSettings();
   console.log(`Script ${fs.existsSync(target) ? 'installed' : 'missing'}: ${target}`);
   console.log(`statusLine: ${settings.statusLine ? JSON.stringify(settings.statusLine) : '(not set)'}`);
-  console.log(isOurs(settings.statusLine) ? 'omp-statusline is active.' : 'omp-statusline is NOT active. Run /omp-statusline:setup');
+  console.log(isOurs(settings.statusLine) ? 'glowline is active.' : 'glowline is NOT active. Run /glowline:setup');
 }
 
 const actions = { install, remove, sync, status };
@@ -108,6 +108,6 @@ if (!action) {
 try {
   action();
 } catch (e) {
-  console.error(`omp-statusline: ${e.message}`);
+  console.error(`glowline: ${e.message}`);
   process.exit(1);
 }
